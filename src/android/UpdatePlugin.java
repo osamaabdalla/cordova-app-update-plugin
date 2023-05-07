@@ -1,7 +1,7 @@
 package com.mrspark.cordova.plugin;
 
 import com.google.android.play.core.appupdate.AppUpdateManager;
-import com.google.android.play.core.tasks.Task;
+import com.google.android.gms.tasks.Task;
 import com.google.android.play.core.install.model.UpdateAvailability;
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
 import com.google.android.play.core.install.model.AppUpdateType;
@@ -19,6 +19,10 @@ import org.apache.cordova.CordovaWebView;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.pm.PackageManager;
+
 import com.google.android.material.snackbar.Snackbar;
 import android.R;
 import android.widget.FrameLayout;
@@ -92,10 +96,18 @@ public class UpdatePlugin extends CordovaPlugin {
 
     @Override
     public boolean execute(final String action, final JSONArray args, final CallbackContext callbackContext) {
-        // Verify that the user sent a "show" action
-        if (!action.equals("update")) {
-            callbackContext.error("\"" + action + "\" is not a recognized action.");
-            return false;
+        
+        if (action.equals("getAppVersion")) {
+            try {
+                PackageManager packageManager = this.cordova.getActivity().getPackageManager();
+                String versionName = packageManager.getPackageInfo(this.cordova.getActivity().getPackageName(), 0).versionName;
+                int versionCode = packageManager.getPackageInfo(this.cordova.getActivity().getPackageName(), 0).versionCode;
+                callbackContext.success(versionName + versionCode);
+                return true;
+            } catch (NameNotFoundException e) {
+                callbackContext.success("N/A");
+                return true;
+            }
         }
 
         final Context context = this.cordova.getContext();

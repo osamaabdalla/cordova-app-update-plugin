@@ -189,8 +189,25 @@ NSString *appStoreURL = nil;
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
+- (void)getAppVersion:(CDVInvokedUrlCommand*)command
+{
+    NSString* callbackId = command.callbackId;
+
+    NSString* versionName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+    if (versionName == nil) {
+      NSLog(@"CFBundleShortVersionString was nil, attempting CFBundleVersion");
+      versionName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
+      if (versionName == nil) {
+        NSLog(@"CFBundleVersion was also nil, giving up");
+        // not calling error callback here to maintain backward compatibility
+      }
+    }
+
+    NSString* versionNumber = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
+    NSString* appVersion = [NSString stringWithFormat:@"%@%@", versionName, versionNumber];
+
+    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:appVersion];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
+}
+
 @end
-
-
-
- 

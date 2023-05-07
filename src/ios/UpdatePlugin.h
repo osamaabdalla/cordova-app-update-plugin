@@ -6,4 +6,6 @@
 
 - (void)update:(CDVInvokedUrlCommand*)command;
 
+- (void)getAppVersion:(CDVInvokedUrlCommand*)command;
+
 @end
